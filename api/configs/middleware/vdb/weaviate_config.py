@@ -25,6 +25,6 @@ class WeaviateConfig(BaseSettings):
     )
 
     WEAVIATE_BATCH_SIZE: PositiveInt = Field(
-        description="Number of objects to be processed in a single batch operation (default is 100)",
-        default=100,
+        description="Number of objects to be processed in a single batch operation (default is 50)",
+        default=50,
     )
