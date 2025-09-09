@@ -6,7 +6,7 @@ from tests.integration_tests.vdb.test_vector_store import (
 
 
 class WeaviateVectorTest(AbstractVectorTest):
-    def __init__(self):
+    def __init__(self, batch_size=50):
         super().__init__()
         self.attributes = ["doc_id", "dataset_id", "document_id", "doc_hash"]
         self.vector = WeaviateVector(
@@ -14,6 +14,7 @@ class WeaviateVectorTest(AbstractVectorTest):
             config=WeaviateConfig(
                 endpoint="http://localhost:8080",
                 api_key="WVF5YThaHlkYwhGUSmCRgsX3tD5ngdN8pkih",
+                batch_size=batch_size,
             ),
             attributes=self.attributes,
         )
@@ -21,3 +22,8 @@ class WeaviateVectorTest(AbstractVectorTest):
 
 def test_weaviate_vector(setup_mock_redis):
     WeaviateVectorTest().run_all_tests()
+
+
+def test_weaviate_vector_with_custom_batch_size(setup_mock_redis):
+    """Test that Weaviate works with a custom batch size"""
+    WeaviateVectorTest(batch_size=25).run_all_tests()
