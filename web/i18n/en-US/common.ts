@@ -16,6 +16,7 @@ const translation = {
     create: 'Create',
     confirm: 'Confirm',
     cancel: 'Cancel',
+    capture: 'Capture',
     clear: 'Clear',
     save: 'Save',
     saveAndEnable: 'Save & Enable',
@@ -133,10 +134,13 @@ const translation = {
       max_tokens: 'Max token',
       max_tokensTip:
         'Used to limit the maximum length of the reply, in tokens. \nLarger values may limit the space left for prompt words, chat logs, and Knowledge. \nIt is recommended to set it below two-thirds\ngpt-4-1106-preview, gpt-4-vision-preview max token (input 128k output 4k)',
-      maxTokenSettingTip: 'Your max token setting is high, potentially limiting space for prompts, queries, and data. Consider setting it below 2/3.',
-      setToCurrentModelMaxTokenTip: 'Max token is updated to the 80% maximum token of the current model {{maxToken}}.',
+      maxTokenSettingTip:
+        'Your max token setting is high, potentially limiting space for prompts, queries, and data. Consider setting it below 2/3.',
+      setToCurrentModelMaxTokenTip:
+        'Max token is updated to the 80% maximum token of the current model {{maxToken}}.',
       stop_sequences: 'Stop sequences',
-      stop_sequencesTip: 'Up to four sequences where the API will stop generating further tokens. The returned text will not contain the stop sequence.',
+      stop_sequencesTip:
+        'Up to four sequences where the API will stop generating further tokens. The returned text will not contain the stop sequence.',
       stop_sequencesPlaceholder: 'Enter sequence and press Tab',
     },
     tone: {
@@ -157,9 +161,11 @@ const translation = {
     account: 'Account',
     plugins: 'Plugins',
     exploreMarketplace: 'Explore Marketplace',
-    pluginsTips: 'Integrate third-party plugins or create ChatGPT-compatible AI-Plugins.',
+    pluginsTips:
+      'Integrate third-party plugins or create ChatGPT-compatible AI-Plugins.',
     datasets: 'Knowledge',
-    datasetsTips: 'COMING SOON: Import your own text data or write data in real-time via Webhook for LLM context enhancement.',
+    datasetsTips:
+      'COMING SOON: Import your own text data or write data in real-time via Webhook for LLM context enhancement.',
     newApp: 'New App',
     newDataset: 'Create Knowledge',
     tools: 'Tools',
@@ -209,7 +215,8 @@ const translation = {
     name: 'Name',
     email: 'Email',
     password: 'Password',
-    passwordTip: 'You can set a permanent password if you don’t want to use temporary login codes',
+    passwordTip:
+      'You can set a permanent password if you don’t want to use temporary login codes',
     setPassword: 'Set a password',
     resetPassword: 'Reset password',
     currentPassword: 'Current password',
@@ -221,10 +228,13 @@ const translation = {
     editName: 'Edit Name',
     showAppLength: 'Show {{length}} apps',
     delete: 'Delete Account',
-    deleteTip: 'Please note, once confirmed, as the Owner of any Workspaces, your workspaces will be scheduled in a queue for permanent deletion, and all your user data will be queued for permanent deletion.',
-    deletePrivacyLinkTip: 'For more information about how we handle your data, please see our ',
+    deleteTip:
+      'Please note, once confirmed, as the Owner of any Workspaces, your workspaces will be scheduled in a queue for permanent deletion, and all your user data will be queued for permanent deletion.',
+    deletePrivacyLinkTip:
+      'For more information about how we handle your data, please see our ',
     deletePrivacyLink: 'Privacy Policy.',
-    deleteSuccessTip: 'Your account needs time to finish deleting. We\'ll email you when it\'s all done.',
+    deleteSuccessTip:
+      'Your account needs time to finish deleting. We\'ll email you when it\'s all done.',
     deleteLabel: 'To confirm, please type in your email below',
     deletePlaceholder: 'Please enter your email',
     sendVerificationButton: 'Send Verification Code',
@@ -242,11 +252,15 @@ const translation = {
       verifyEmail: 'Verify your current email',
       newEmail: 'Set up a new email address',
       verifyNew: 'Verify your new email',
-      authTip: 'Once your email is changed, Google or GitHub accounts linked to your old email will no longer be able to log in to this account.',
-      content1: 'If you continue, we\'ll send a verification code to <email>{{email}}</email> for re-authentication.',
-      content2: 'Your current email is <email>{{email}}</email>. Verification code has been sent to this email address.',
+      authTip:
+        'Once your email is changed, Google or GitHub accounts linked to your old email will no longer be able to log in to this account.',
+      content1:
+        'If you continue, we\'ll send a verification code to <email>{{email}}</email> for re-authentication.',
+      content2:
+        'Your current email is <email>{{email}}</email>. Verification code has been sent to this email address.',
       content3: 'Enter a new email and we will send you a verification code.',
-      content4: 'We just sent you a temporary verification code to <email>{{email}}</email>.',
+      content4:
+        'We just sent you a temporary verification code to <email>{{email}}</email>.',
       codeLabel: 'Verification code',
       codePlaceholder: 'Paste the 6-digit code',
       emailLabel: 'New email',
@@ -280,15 +294,18 @@ const translation = {
     datasetOperator: 'Knowledge Admin',
     datasetOperatorTip: 'Only can manage the knowledge base',
     inviteTeamMember: 'Add team member',
-    inviteTeamMemberTip: 'They can access your team data directly after signing in.',
-    emailNotSetup: 'Email server is not set up, so invitation emails cannot be sent. Please notify users of the invitation link that will be issued after invitation instead.',
+    inviteTeamMemberTip:
+      'They can access your team data directly after signing in.',
+    emailNotSetup:
+      'Email server is not set up, so invitation emails cannot be sent. Please notify users of the invitation link that will be issued after invitation instead.',
     email: 'Email',
     emailInvalid: 'Invalid Email Format',
     emailPlaceholder: 'Please input emails',
     sendInvite: 'Send Invite',
     invitedAsRole: 'Invited as {{role}} user',
     invitationSent: 'Invitation sent',
-    invitationSentTip: 'Invitation sent, and they can sign in to Dify to access your team data.',
+    invitationSentTip:
+      'Invitation sent, and they can sign in to Dify to access your team data.',
     invitationLink: 'Invitation Link',
     failedInvitationEmails: 'Below users were not invited successfully',
     ok: 'OK',
@@ -304,12 +321,16 @@ const translation = {
     transferOwnership: 'Transfer Ownership',
     transferModal: {
       title: 'Transfer workspace ownership',
-      warning: 'You\'re about to transfer ownership of “{{workspace}}”. This takes effect immediately and can\'t be undone.',
-      warningTip: 'You\'ll become an admin member, and the new owner will have full control.',
-      sendTip: 'If you continue, we\'ll send a verification code to <email>{{email}}</email> for re-authentication.',
+      warning:
+        'You\'re about to transfer ownership of “{{workspace}}”. This takes effect immediately and can\'t be undone.',
+      warningTip:
+        'You\'ll become an admin member, and the new owner will have full control.',
+      sendTip:
+        'If you continue, we\'ll send a verification code to <email>{{email}}</email> for re-authentication.',
       verifyEmail: 'Verify your current email',
       verifyContent: 'Your current email is <email>{{email}}</email>.',
-      verifyContent2: 'We\'ll send a temporary verification code to this email for re-authentication.',
+      verifyContent2:
+        'We\'ll send a temporary verification code to this email for re-authentication.',
       codeLabel: 'Verification code',
       codePlaceholder: 'Paste the 6-digit code',
       resendTip: 'Didn\'t receive a code?',
@@ -378,11 +399,13 @@ const translation = {
       usedUp: 'Trial quota used up. Add own Model Provider.',
       useYourModel: 'Currently using own Model Provider.',
       close: 'Close',
-      trialQuotaTip: 'Your Anthropic trial quota will expire on 2025/03/17 and will no longer be available thereafter. Please make use of it in time.',
+      trialQuotaTip:
+        'Your Anthropic trial quota will expire on 2025/03/17 and will no longer be available thereafter. Please make use of it in time.',
     },
     anthropic: {
       using: 'The embedding capability is using',
-      enableTip: 'To enable the Anthropic model, you need to bind to OpenAI or Azure OpenAI Service first.',
+      enableTip:
+        'To enable the Anthropic model, you need to bind to OpenAI or Azure OpenAI Service first.',
       notEnabled: 'Not enabled',
       keyFrom: 'Get your API key from Anthropic',
     },
@@ -443,7 +466,8 @@ const translation = {
       tip: 'Priority will be given to the paid quota. The Trial quota will be used after the paid quota is exhausted.',
     },
     item: {
-      deleteDesc: '{{modelName}} are being used as system reasoning models. Some functions will not be available after removal. Please confirm.',
+      deleteDesc:
+        '{{modelName}} are being used as system reasoning models. Some functions will not be available after removal. Please confirm.',
       freeQuota: 'FREE QUOTA',
     },
     addApiKey: 'Add your API key',
@@ -476,19 +500,23 @@ const translation = {
     loadPresets: 'Load Presets',
     parameters: 'PARAMETERS',
     loadBalancing: 'Load balancing',
-    loadBalancingDescription: 'Configure multiple credentials for the model and invoke them automatically. ',
+    loadBalancingDescription:
+      'Configure multiple credentials for the model and invoke them automatically. ',
     loadBalancingHeadline: 'Load Balancing',
     configLoadBalancing: 'Config Load Balancing',
     modelHasBeenDeprecated: 'This model has been deprecated',
     providerManaged: 'Provider managed',
-    providerManagedDescription: 'Use the single set of credentials provided by the model provider.',
+    providerManagedDescription:
+      'Use the single set of credentials provided by the model provider.',
     defaultConfig: 'Default Config',
     apiKeyStatusNormal: 'APIKey status is normal',
     apiKeyRateLimit: 'Rate limit was reached, available after {{seconds}}s',
     addConfig: 'Add Config',
     editConfig: 'Edit Config',
-    loadBalancingLeastKeyWarning: 'To enable load balancing at least 2 keys must be enabled.',
-    loadBalancingInfo: 'By default, load balancing uses the Round-robin strategy. If rate limiting is triggered, a 1-minute cooldown period will be applied.',
+    loadBalancingLeastKeyWarning:
+      'To enable load balancing at least 2 keys must be enabled.',
+    loadBalancingInfo:
+      'By default, load balancing uses the Round-robin strategy. If rate limiting is triggered, a 1-minute cooldown period will be applied.',
     upgradeForLoadBalancing: 'Upgrade your plan to enable Load Balancing.',
     toBeConfigured: 'To be configured',
     configureTip: 'Set up api-key or add model to use',
@@ -514,7 +542,8 @@ const translation = {
       specifyModelCredential: 'Specify model credential',
       specifyModelCredentialTip: 'Use a configured model credential.',
       providerManaged: 'Provider managed',
-      providerManagedTip: 'The current configuration is hosted by the provider.',
+      providerManagedTip:
+        'The current configuration is hosted by the provider.',
       apiKeyModal: {
         title: 'API Key Authorization Configuration',
         desc: 'After configuring credentials, all members within the workspace can use this model when orchestrating applications.',
@@ -525,9 +554,11 @@ const translation = {
       addNewModelCredential: 'Add new model credential',
       removeModel: 'Remove Model',
       selectModelCredential: 'Select a model credential',
-      customModelCredentialsDeleteTip: 'Credential is in use and cannot be deleted',
+      customModelCredentialsDeleteTip:
+        'Credential is in use and cannot be deleted',
     },
-    parametersInvalidRemoved: 'Some parameters are invalid and have been removed',
+    parametersInvalidRemoved:
+      'Some parameters are invalid and have been removed',
   },
   dataSource: {
     add: 'Add a data source',
@@ -541,7 +572,8 @@ const translation = {
       connected: 'Connected',
       disconnected: 'Disconnected',
       changeAuthorizedPages: 'Change authorized pages',
-      integratedAlert: 'Notion is integrated via internal credential, no need to re-authorize.',
+      integratedAlert:
+        'Notion is integrated via internal credential, no need to re-authorize.',
       pagesAuthorized: 'Pages authorized',
       sync: 'Sync',
       remove: 'Remove',
@@ -570,7 +602,8 @@ const translation = {
     },
   },
   apiBasedExtension: {
-    title: 'API extensions provide centralized API management, simplifying configuration for easy use across Dify\'s applications.',
+    title:
+      'API extensions provide centralized API management, simplifying configuration for easy use across Dify\'s applications.',
     link: 'Learn how to develop your own API Extension.',
     add: 'Add API Extension',
     selector: {
@@ -622,7 +655,8 @@ const translation = {
     documents: 'Documents',
     hitTesting: 'Retrieval Testing',
     settings: 'Settings',
-    emptyTip: 'This Knowledge has not been integrated within any application. Please refer to the document for guidance.',
+    emptyTip:
+      'This Knowledge has not been integrated within any application. Please refer to the document for guidance.',
     viewDoc: 'View documentation',
     relatedApp: 'linked apps',
     noRelatedApp: 'No linked apps',
@@ -663,7 +697,8 @@ const translation = {
     resend: 'Resend',
   },
   promptEditor: {
-    placeholder: 'Write your prompt word here, enter \'{\' to insert a variable, enter \'/\' to insert a prompt content block',
+    placeholder:
+      'Write your prompt word here, enter \'{\' to insert a variable, enter \'/\' to insert a prompt content block',
     context: {
       item: {
         title: 'Context',
@@ -721,6 +756,7 @@ const translation = {
   },
   fileUploader: {
     uploadFromComputer: 'Local upload',
+    takePhoto: 'Take photo',
     pasteFileLink: 'Paste file link',
     pasteFileLinkInputPlaceholder: 'Enter URL...',
     uploadFromComputerReadError: 'File reading failed, please try again.',
@@ -754,7 +790,8 @@ const translation = {
   },
   avatar: {
     deleteTitle: 'Remove Avatar',
-    deleteDescription: 'Are you sure you want to remove your profile picture? Your account will use the default initial avatar.',
+    deleteDescription:
+      'Are you sure you want to remove your profile picture? Your account will use the default initial avatar.',
   },
   imageInput: {
     dropImageHere: 'Drop your image here, or',

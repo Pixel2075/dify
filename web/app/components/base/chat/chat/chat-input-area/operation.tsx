@@ -1,63 +1,57 @@
 import { memo } from 'react'
-import {
-  RiMicLine,
-  RiSendPlane2Fill,
-} from '@remixicon/react'
-import type {
-  EnableType,
-} from '../../types'
+import { RiMicLine, RiSendPlane2Fill } from '@remixicon/react'
+import type { EnableType } from '../../types'
 import type { Theme } from '../../embedded-chatbot/theme/theme-context'
 import Button from '@/app/components/base/button'
 import ActionButton from '@/app/components/base/action-button'
-import { FileUploaderInChatInput } from '@/app/components/base/file-uploader'
+import {
+  CameraButton,
+  FileUploaderInChatInput,
+} from '@/app/components/base/file-uploader'
 import type { FileUpload } from '@/app/components/base/features/types'
 import cn from '@/utils/classnames'
 
 type OperationProps = {
-  fileConfig?: FileUpload
-  speechToTextConfig?: EnableType
-  onShowVoiceInput?: () => void
-  onSend: () => void
-  theme?: Theme | null
+  fileConfig?: FileUpload;
+  speechToTextConfig?: EnableType;
+  onShowVoiceInput?: () => void;
+  onSend: () => void;
+  theme?: Theme | null;
 }
-const Operation = (
-  {
-    ref,
-    fileConfig,
-    speechToTextConfig,
-    onShowVoiceInput,
-    onSend,
-    theme,
-  }: OperationProps & {
-    ref: React.RefObject<HTMLDivElement>;
-  },
-) => {
+const Operation = ({
+  ref,
+  fileConfig,
+  speechToTextConfig,
+  onShowVoiceInput,
+  onSend,
+  theme,
+}: OperationProps & {
+  ref: React.RefObject<HTMLDivElement>;
+}) => {
   return (
-    <div
-      className={cn(
-        'flex shrink-0 items-center justify-end',
-      )}
-    >
-      <div
-        className='flex items-center pl-1'
-        ref={ref}
-      >
-        <div className='flex items-center space-x-1'>
-          {fileConfig?.enabled && <FileUploaderInChatInput fileConfig={fileConfig} />}
-          {
-            speechToTextConfig?.enabled && (
-              <ActionButton
-                size='l'
-                onClick={onShowVoiceInput}
-              >
-                <RiMicLine className='h-5 w-5' />
-              </ActionButton>
-            )
-          }
+    <div className={cn('flex shrink-0 items-center justify-end')}>
+      <div className="flex items-center pl-1" ref={ref}>
+        <div className="flex items-center space-x-1">
+          {fileConfig?.enabled && (
+            <>
+              <CameraButton
+                fileConfig={fileConfig}
+                disabled={
+                  !!fileConfig.number_limits && fileConfig.number_limits <= 0
+                }
+              />
+              <FileUploaderInChatInput fileConfig={fileConfig} />
+            </>
+          )}
+          {speechToTextConfig?.enabled && (
+            <ActionButton size="l" onClick={onShowVoiceInput}>
+              <RiMicLine className="h-5 w-5" />
+            </ActionButton>
+          )}
         </div>
         <Button
-          className='ml-3 w-8 px-0'
-          variant='primary'
+          className="ml-3 w-8 px-0"
+          variant="primary"
           onClick={onSend}
           style={
             theme
@@ -67,7 +61,7 @@ const Operation = (
               : {}
           }
         >
-          <RiSendPlane2Fill className='h-4 w-4' />
+          <RiSendPlane2Fill className="h-4 w-4" />
         </Button>
       </div>
     </div>
