@@ -167,13 +167,17 @@ class AudioService:
                 # Second try: parse message JSON for assistant response
                 elif hasattr(message, 'message') and message.message:
                     try:
+                        logger.info(f"Message JSON type: {type(message.message)}, content: {str(message.message)[:500]}")
                         if isinstance(message.message, list):
                             # Look for assistant role message
                             for msg in message.message:
-                                if isinstance(msg, dict) and msg.get('role') == 'assistant':
-                                    text_content = msg.get('text', '') or msg.get('content', '')
-                                    logger.info(f"Found assistant message in JSON, length={len(text_content)}")
-                                    break
+                                if isinstance(msg, dict):
+                                    msg_role = msg.get('role', 'NO_ROLE')
+                                    logger.info(f"Found message with role: {msg_role}")
+                                    if msg_role == 'assistant':
+                                        text_content = msg.get('text', '') or msg.get('content', '')
+                                        logger.info(f"Found assistant message in JSON, length={len(text_content)}")
+                                        break
                         elif isinstance(message.message, dict):
                             # If message is a dict, check if it has the text directly
                             text_content = message.message.get('text', '') or message.message.get('content', '')
@@ -181,6 +185,8 @@ class AudioService:
                                 logger.info(f"Found text in message dict, length={len(text_content)}")
                     except Exception as e:
                         logger.warning(f"Error parsing message JSON: {e}")
+                else:
+                    logger.warning(f"No message JSON field found or it's None/empty")
 
                 # If we found text content, proceed with TTS
                 if text_content and text_content.strip():
