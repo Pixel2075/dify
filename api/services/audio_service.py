@@ -140,8 +140,8 @@ class AudioService:
                 return None
 
             # Retry logic to handle race condition where message answer isn't saved yet
-            max_retries = 3
-            retry_delay = 0.3  # 300ms
+            max_retries = 5
+            retry_delay = 0.5  # 500ms
 
             for attempt in range(max_retries):
                 # Refresh session to get latest data from database
