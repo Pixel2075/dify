@@ -135,11 +135,14 @@ class AudioService:
             try:
                 uuid.UUID(message_id)
             except ValueError:
+                logger.warning(f"Invalid message_id format: {message_id}")
                 return None
             message = db.session.query(Message).where(Message.id == message_id).first()
             if message is None:
+                logger.warning(f"Message not found: {message_id}")
                 return None
             if message.answer == "" and message.status == MessageStatus.NORMAL:
+                logger.warning(f"Message answer is empty, status: {message.status}, message_id: {message_id}")
                 return None
 
             else:

@@ -116,6 +116,9 @@ class TextApi(WebApiResource):
                 app_model=app_model, text=text, voice=voice, end_user=end_user.external_user_id, message_id=message_id
             )
 
+            if response is None:
+                raise ValueError("Audio generation failed - message may not be ready yet")
+
             return response
         except services.errors.app_model_config.AppModelConfigBrokenError:
             logger.exception("App model config broken.")
