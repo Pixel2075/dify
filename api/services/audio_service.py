@@ -132,24 +132,40 @@ class AudioService:
                     raise e
 
         if message_id:
+            import time
             try:
                 uuid.UUID(message_id)
             except ValueError:
                 logger.warning(f"Invalid message_id format: {message_id}")
                 return None
-            message = db.session.query(Message).where(Message.id == message_id).first()
-            if message is None:
-                logger.warning(f"Message not found: {message_id}")
-                return None
-            if message.answer == "" and message.status == MessageStatus.NORMAL:
-                logger.warning(f"Message answer is empty, status: {message.status}, message_id: {message_id}")
-                return None
 
-            else:
-                response = invoke_tts(text_content=message.answer, app_model=app_model, voice=voice, is_draft=is_draft)
-                if isinstance(response, Generator):
-                    return Response(stream_with_context(response), content_type="audio/mpeg")
-                return response
+            # Retry logic to handle race condition where message answer isn't saved yet
+            max_retries = 3
+            retry_delay = 0.3  # 300ms
+
+            for attempt in range(max_retries):
+                message = db.session.query(Message).where(Message.id == message_id).first()
+                if message is None:
+                    logger.warning(f"Message not found: {message_id}")
+                    return None
+
+                # If answer is not empty, proceed with TTS
+                if message.answer != "":
+                    response = invoke_tts(text_content=message.answer, app_model=app_model, voice=voice, is_draft=is_draft)
+                    if isinstance(response, Generator):
+                        return Response(stream_with_context(response), content_type="audio/mpeg")
+                    return response
+
+                # If answer is empty and status is NORMAL, this might be a race condition
+                # Wait and retry (except on last attempt)
+                if message.status == MessageStatus.NORMAL and attempt < max_retries - 1:
+                    logger.info(f"Message answer empty on attempt {attempt + 1}/{max_retries}, retrying... message_id: {message_id}")
+                    time.sleep(retry_delay)
+                    db.session.expire(message)  # Refresh the message from DB
+                else:
+                    # Last attempt and still empty, or status is not NORMAL
+                    logger.warning(f"Message answer is empty after {attempt + 1} attempts, status: {message.status}, message_id: {message_id}")
+                    return None
         else:
             if text is None:
                 raise ValueError("Text is required")
