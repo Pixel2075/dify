@@ -612,6 +612,8 @@ services:
     volumes:
       # Mount the storage directory to the container, for storing user files.
       - ./volumes/app/storage:/app/api/storage
+      # Mount only the single file we modified
+      - ../api/controllers/web/audio.py:/app/api/controllers/web/audio.py
     networks:
       - ssrf_proxy_network
       - default
@@ -639,6 +641,8 @@ services:
     volumes:
       # Mount the storage directory to the container, for storing user files.
       - ./volumes/app/storage:/app/api/storage
+      # Mount only the single file we modified
+      - ../api/controllers/web/audio.py:/app/api/controllers/web/audio.py
     networks:
       - ssrf_proxy_network
       - default
