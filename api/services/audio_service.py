@@ -155,7 +155,8 @@ class AudioService:
 
                 # Log the actual answer content for debugging
                 answer_preview = message.answer[:100] if message.answer else "[EMPTY]"
-                logger.info(f"Attempt {attempt + 1}/{max_retries}: message_id={message_id}, answer_length={len(message.answer)}, preview={answer_preview}")
+                message_json_preview = str(message.message)[:200] if hasattr(message, 'message') and message.message else "[NO MESSAGE JSON]"
+                logger.info(f"Attempt {attempt + 1}/{max_retries}: message_id={message_id}, answer_length={len(message.answer)}, answer_preview={answer_preview}, message_json={message_json_preview}")
 
                 # If answer is not empty, proceed with TTS
                 if message.answer and message.answer.strip():
