@@ -155,12 +155,36 @@ class AudioService:
 
                 # Log the actual answer content for debugging
                 answer_preview = message.answer[:100] if message.answer else "[EMPTY]"
-                message_json_preview = str(message.message)[:200] if hasattr(message, 'message') and message.message else "[NO MESSAGE JSON]"
-                logger.info(f"Attempt {attempt + 1}/{max_retries}: message_id={message_id}, answer_length={len(message.answer)}, answer_preview={answer_preview}, message_json={message_json_preview}")
+                logger.info(f"Attempt {attempt + 1}/{max_retries}: message_id={message_id}, answer_field_length={len(message.answer)}")
 
-                # If answer is not empty, proceed with TTS
+                # Try to get the text content - check multiple possible sources
+                text_content = None
+
+                # First try: answer field
                 if message.answer and message.answer.strip():
-                    response = invoke_tts(text_content=message.answer, app_model=app_model, voice=voice, is_draft=is_draft)
+                    text_content = message.answer
+                    logger.info(f"Using answer field for TTS, length={len(text_content)}")
+                # Second try: parse message JSON for assistant response
+                elif hasattr(message, 'message') and message.message:
+                    try:
+                        if isinstance(message.message, list):
+                            # Look for assistant role message
+                            for msg in message.message:
+                                if isinstance(msg, dict) and msg.get('role') == 'assistant':
+                                    text_content = msg.get('text', '') or msg.get('content', '')
+                                    logger.info(f"Found assistant message in JSON, length={len(text_content)}")
+                                    break
+                        elif isinstance(message.message, dict):
+                            # If message is a dict, check if it has the text directly
+                            text_content = message.message.get('text', '') or message.message.get('content', '')
+                            if text_content:
+                                logger.info(f"Found text in message dict, length={len(text_content)}")
+                    except Exception as e:
+                        logger.warning(f"Error parsing message JSON: {e}")
+
+                # If we found text content, proceed with TTS
+                if text_content and text_content.strip():
+                    response = invoke_tts(text_content=text_content, app_model=app_model, voice=voice, is_draft=is_draft)
                     if isinstance(response, Generator):
                         return Response(stream_with_context(response), content_type="audio/mpeg")
                     return response
