@@ -144,26 +144,32 @@ class AudioService:
             retry_delay = 0.3  # 300ms
 
             for attempt in range(max_retries):
+                # Refresh session to get latest data from database
+                db.session.expire_all()
+                db.session.commit()  # Ensure any pending transactions are committed
+
                 message = db.session.query(Message).where(Message.id == message_id).first()
                 if message is None:
                     logger.warning(f"Message not found: {message_id}")
                     return None
 
+                # Log the actual answer content for debugging
+                answer_preview = message.answer[:100] if message.answer else "[EMPTY]"
+                logger.info(f"Attempt {attempt + 1}/{max_retries}: message_id={message_id}, answer_length={len(message.answer)}, preview={answer_preview}")
+
                 # If answer is not empty, proceed with TTS
-                if message.answer != "":
+                if message.answer and message.answer.strip():
                     response = invoke_tts(text_content=message.answer, app_model=app_model, voice=voice, is_draft=is_draft)
                     if isinstance(response, Generator):
                         return Response(stream_with_context(response), content_type="audio/mpeg")
                     return response
 
-                # If answer is empty and status is NORMAL, this might be a race condition
-                # Wait and retry (except on last attempt)
-                if message.status == MessageStatus.NORMAL and attempt < max_retries - 1:
+                # If answer is empty and we have more retries, wait and try again
+                if attempt < max_retries - 1:
                     logger.info(f"Message answer empty on attempt {attempt + 1}/{max_retries}, retrying... message_id: {message_id}")
                     time.sleep(retry_delay)
-                    db.session.expire(message)  # Refresh the message from DB
                 else:
-                    # Last attempt and still empty, or status is not NORMAL
+                    # Last attempt and still empty
                     logger.warning(f"Message answer is empty after {attempt + 1} attempts, status: {message.status}, message_id: {message_id}")
                     return None
         else:
