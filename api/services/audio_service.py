@@ -169,15 +169,20 @@ class AudioService:
                     try:
                         logger.info(f"Message JSON type: {type(message.message)}, content: {str(message.message)[:500]}")
                         if isinstance(message.message, list):
-                            # Look for assistant role message
+                            # Look for the LAST assistant role message (most recent response)
+                            assistant_messages = []
                             for msg in message.message:
                                 if isinstance(msg, dict):
                                     msg_role = msg.get('role', 'NO_ROLE')
                                     logger.info(f"Found message with role: {msg_role}")
                                     if msg_role == 'assistant':
-                                        text_content = msg.get('text', '') or msg.get('content', '')
-                                        logger.info(f"Found assistant message in JSON, length={len(text_content)}")
-                                        break
+                                        msg_text = msg.get('text', '') or msg.get('content', '')
+                                        assistant_messages.append(msg_text)
+
+                            # Use the LAST assistant message (most recent)
+                            if assistant_messages:
+                                text_content = assistant_messages[-1]
+                                logger.info(f"Found {len(assistant_messages)} assistant messages, using last one with length={len(text_content)}")
                         elif isinstance(message.message, dict):
                             # If message is a dict, check if it has the text directly
                             text_content = message.message.get('text', '') or message.message.get('content', '')
