@@ -145,20 +145,24 @@ class AudioService:
             retry_delay = 0.5  # 500ms between retries, max wait = 5 seconds
 
             for attempt in range(max_retries):
-                # Refresh session to get latest data from database
-                db.session.expire_all()
-                db.session.commit()  # Ensure any pending transactions are committed
+                # Close any existing transaction and start fresh to see latest committed data
+                db.session.rollback()  # Abort current transaction
+                db.session.expire_all()  # Clear all cached objects
 
                 message = db.session.query(Message).where(Message.id == message_id).first()
                 if message is None:
-                    logger.warning(f"Message not found: {message_id}")
+                    logger.warning(f"TTS: Message not found in database: {message_id}")
                     return None
+
+                # Debug: Log full message state
+                answer_preview = (message.answer[:100] + "...") if message.answer and len(message.answer) > 100 else message.answer
+                logger.info(f"TTS: Attempt {attempt + 1}/{max_retries} - Message state: id={message_id}, status={message.status}, answer_length={len(message.answer) if message.answer else 0}, answer_preview='{answer_preview}', updated_at={message.updated_at}")
 
                 # The answer field contains the bot's response and is populated when streaming completes
                 # The message.message field contains the PROMPT (conversation history), not the response
                 if message.answer and message.answer.strip():
                     text_content = message.answer.strip()
-                    logger.info(f"TTS: Found answer for message {message_id}, length={len(text_content)}")
+                    logger.info(f"TTS: SUCCESS - Found answer for message {message_id}, length={len(text_content)}")
                     response = invoke_tts(text_content=text_content, app_model=app_model, voice=voice, is_draft=is_draft)
                     if isinstance(response, Generator):
                         return Response(stream_with_context(response), content_type="audio/mpeg")
@@ -166,11 +170,11 @@ class AudioService:
 
                 # If answer is empty and we have more retries, wait and try again
                 if attempt < max_retries - 1:
-                    logger.info(f"TTS: Message answer not ready yet, attempt {attempt + 1}/{max_retries}, waiting {retry_delay}s... message_id: {message_id}")
+                    logger.info(f"TTS: Message answer not ready yet (empty or whitespace only), waiting {retry_delay}s before retry...")
                     time.sleep(retry_delay)
                 else:
-                    # Last attempt and still empty
-                    logger.warning(f"TTS: Message answer is still empty after {max_retries} attempts ({max_retries * retry_delay}s total wait), status: {message.status}, message_id: {message_id}")
+                    # Last attempt and still empty - this is abnormal if user can see the message
+                    logger.error(f"TTS: FAILED - Message answer is still empty after {max_retries} attempts ({max_retries * retry_delay}s total wait). Message ID: {message_id}, Status: {message.status}, This suggests the message.answer field is not being populated by the system. Check if this is the correct message ID for the assistant response.")
                     return None
         else:
             if text is None:
