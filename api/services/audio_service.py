@@ -131,18 +131,29 @@ class AudioService:
                 except Exception as e:
                     raise e
 
+        # Priority 1: If text is provided directly, use it (frontend sends text for streaming messages)
+        if text and text.strip():
+            logger.info(f"TTS: Using provided text parameter, length={len(text)}, message_id={message_id if message_id else 'None'}")
+            response = invoke_tts(text_content=text.strip(), app_model=app_model, voice=voice, is_draft=is_draft)
+            if isinstance(response, Generator):
+                return Response(stream_with_context(response), content_type="audio/mpeg")
+            return response
+
+        # Priority 2: If text not provided but message_id is, fetch from database
         if message_id:
             import time
             try:
                 uuid.UUID(message_id)
             except ValueError:
-                logger.warning(f"Invalid message_id format: {message_id}")
+                logger.warning(f"TTS: Invalid message_id format: {message_id}")
                 return None
 
             # Retry logic to handle race condition where message answer isn't saved yet
             # The message.answer field is populated when streaming completes in _save_message()
             max_retries = 10
             retry_delay = 0.5  # 500ms between retries, max wait = 5 seconds
+
+            logger.info(f"TTS: No text provided, attempting to fetch from database for message_id={message_id}")
 
             for attempt in range(max_retries):
                 # Close any existing transaction and start fresh to see latest committed data
@@ -162,7 +173,7 @@ class AudioService:
                 # The message.message field contains the PROMPT (conversation history), not the response
                 if message.answer and message.answer.strip():
                     text_content = message.answer.strip()
-                    logger.info(f"TTS: SUCCESS - Found answer for message {message_id}, length={len(text_content)}")
+                    logger.info(f"TTS: SUCCESS - Found answer in database for message {message_id}, length={len(text_content)}")
                     response = invoke_tts(text_content=text_content, app_model=app_model, voice=voice, is_draft=is_draft)
                     if isinstance(response, Generator):
                         return Response(stream_with_context(response), content_type="audio/mpeg")
@@ -173,16 +184,13 @@ class AudioService:
                     logger.info(f"TTS: Message answer not ready yet (empty or whitespace only), waiting {retry_delay}s before retry...")
                     time.sleep(retry_delay)
                 else:
-                    # Last attempt and still empty - this is abnormal if user can see the message
-                    logger.error(f"TTS: FAILED - Message answer is still empty after {max_retries} attempts ({max_retries * retry_delay}s total wait). Message ID: {message_id}, Status: {message.status}, This suggests the message.answer field is not being populated by the system. Check if this is the correct message ID for the assistant response.")
+                    # Last attempt and still empty
+                    logger.error(f"TTS: FAILED - Message answer is still empty after {max_retries} attempts ({max_retries * retry_delay}s total wait). Message ID: {message_id}, Status: {message.status}")
                     return None
-        else:
-            if text is None:
-                raise ValueError("Text is required")
-            response = invoke_tts(text_content=text, app_model=app_model, voice=voice, is_draft=is_draft)
-            if isinstance(response, Generator):
-                return Response(stream_with_context(response), content_type="audio/mpeg")
-            return response
+
+        # Priority 3: Neither text nor message_id provided - error
+        logger.error("TTS: No text or message_id provided")
+        raise ValueError("Text or message_id is required")
 
     @classmethod
     def transcript_tts_voices(cls, tenant_id: str, language: str):
