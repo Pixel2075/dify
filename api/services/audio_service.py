@@ -140,8 +140,9 @@ class AudioService:
                 return None
 
             # Retry logic to handle race condition where message answer isn't saved yet
-            max_retries = 5
-            retry_delay = 0.5  # 500ms
+            # The message.answer field is populated when streaming completes in _save_message()
+            max_retries = 10
+            retry_delay = 0.5  # 500ms between retries, max wait = 5 seconds
 
             for attempt in range(max_retries):
                 # Refresh session to get latest data from database
@@ -153,48 +154,11 @@ class AudioService:
                     logger.warning(f"Message not found: {message_id}")
                     return None
 
-                # Log the actual answer content for debugging
-                answer_preview = message.answer[:100] if message.answer else "[EMPTY]"
-                logger.info(f"Attempt {attempt + 1}/{max_retries}: message_id={message_id}, answer_field_length={len(message.answer)}")
-
-                # Try to get the text content - check multiple possible sources
-                text_content = None
-
-                # First try: answer field
+                # The answer field contains the bot's response and is populated when streaming completes
+                # The message.message field contains the PROMPT (conversation history), not the response
                 if message.answer and message.answer.strip():
-                    text_content = message.answer
-                    logger.info(f"Using answer field for TTS, length={len(text_content)}")
-                # Second try: parse message JSON for assistant response
-                elif hasattr(message, 'message') and message.message:
-                    try:
-                        logger.info(f"Message JSON type: {type(message.message)}, content: {str(message.message)[:500]}")
-                        if isinstance(message.message, list):
-                            # Look for the LAST assistant role message (most recent response)
-                            assistant_messages = []
-                            for msg in message.message:
-                                if isinstance(msg, dict):
-                                    msg_role = msg.get('role', 'NO_ROLE')
-                                    logger.info(f"Found message with role: {msg_role}")
-                                    if msg_role == 'assistant':
-                                        msg_text = msg.get('text', '') or msg.get('content', '')
-                                        assistant_messages.append(msg_text)
-
-                            # Use the LAST assistant message (most recent)
-                            if assistant_messages:
-                                text_content = assistant_messages[-1]
-                                logger.info(f"Found {len(assistant_messages)} assistant messages, using last one with length={len(text_content)}")
-                        elif isinstance(message.message, dict):
-                            # If message is a dict, check if it has the text directly
-                            text_content = message.message.get('text', '') or message.message.get('content', '')
-                            if text_content:
-                                logger.info(f"Found text in message dict, length={len(text_content)}")
-                    except Exception as e:
-                        logger.warning(f"Error parsing message JSON: {e}")
-                else:
-                    logger.warning(f"No message JSON field found or it's None/empty")
-
-                # If we found text content, proceed with TTS
-                if text_content and text_content.strip():
+                    text_content = message.answer.strip()
+                    logger.info(f"TTS: Found answer for message {message_id}, length={len(text_content)}")
                     response = invoke_tts(text_content=text_content, app_model=app_model, voice=voice, is_draft=is_draft)
                     if isinstance(response, Generator):
                         return Response(stream_with_context(response), content_type="audio/mpeg")
@@ -202,11 +166,11 @@ class AudioService:
 
                 # If answer is empty and we have more retries, wait and try again
                 if attempt < max_retries - 1:
-                    logger.info(f"Message answer empty on attempt {attempt + 1}/{max_retries}, retrying... message_id: {message_id}")
+                    logger.info(f"TTS: Message answer not ready yet, attempt {attempt + 1}/{max_retries}, waiting {retry_delay}s... message_id: {message_id}")
                     time.sleep(retry_delay)
                 else:
                     # Last attempt and still empty
-                    logger.warning(f"Message answer is empty after {attempt + 1} attempts, status: {message.status}, message_id: {message_id}")
+                    logger.warning(f"TTS: Message answer is still empty after {max_retries} attempts ({max_retries * retry_delay}s total wait), status: {message.status}, message_id: {message_id}")
                     return None
         else:
             if text is None:
